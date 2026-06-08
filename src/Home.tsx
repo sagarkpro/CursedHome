@@ -7,12 +7,15 @@ import { sites } from "./constants/SiteDataConstants";
 import { tools } from "./constants/ToolDataConstants";
 import LocalhostPortLauncher from "./components/LocalhostPortLauncher";
 import { cn, splitInHalf } from "./Utils/common";
+import { useAuth0 } from "@auth0/auth0-react";
+import UserProfile from "./components/UserProfile";
 
 export default function Home() {
 	const tabs: ViewType[] = ["shortcuts", "repositories", "tools"];
 	const [leftSites, rightSites] = splitInHalf(sites);
 	const [leftTools, rightTools] = splitInHalf(tools);
 	const [currentView, setCurrentView] = useState<ViewType>("shortcuts");
+	const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
 	const [isAnime, setIsAnime] = useState<boolean>(() => {
 		const stored = localStorage.getItem("isAnime");
 		return stored ? JSON.parse(stored) : false;
@@ -49,7 +52,11 @@ export default function Home() {
 							</button>
 						</div>
 						<div className="flex items-center justify-end">
-							<button className="px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">Login</button>
+							{isLoading ? null : isAuthenticated ? (
+								<UserProfile />
+							) : (
+								<button onClick={() => loginWithRedirect()} className="px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">Login</button>
+							)}
 						</div>
 					</div>
 				</div>
