@@ -1,5 +1,5 @@
 import { copyToClipboard } from "@/Utils/CopyToClipboard";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ClipboardCopy } from "lucide-react";
 
 export default function GuidGenerator() {
