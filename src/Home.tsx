@@ -46,7 +46,7 @@ export default function Home() {
 					</div>
 
 					<div className="flex w-full md:w-max justify-between md:justify-normal">
-						<div className="flex items-center justify-end md:px-12">
+						<div className="flex items-center justify-end md:px-3">
 							<button className="rounded-full bg-zinc-50 text-black p-1 w-[5.5rem]" onClick={changeTheme}>
 								<div className={`rounded-[5rem] w-10 h-10 transition-all duration-150 bg-cover bg-center ${isAnime ? buttonImage : "bg-black"}`} style={{ transform: `translateX(${translateX})` }}></div>
 							</button>
@@ -55,7 +55,9 @@ export default function Home() {
 							{isLoading ? null : isAuthenticated ? (
 								<UserProfile />
 							) : (
-								<button onClick={() => loginWithRedirect()} className="px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">Login</button>
+								<button onClick={() => loginWithRedirect()} className="px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">
+									Login
+								</button>
 							)}
 						</div>
 					</div>
