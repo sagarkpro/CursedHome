@@ -8,6 +8,7 @@ export interface UserInfo {
 	email?: string;
 	email_verified?: boolean;
 	picture?: string;
+	role: string;
 }
 
 interface AuthState {

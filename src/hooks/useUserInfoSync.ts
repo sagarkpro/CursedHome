@@ -12,6 +12,7 @@ function userInfoFromClaims(user: User): UserInfo {
 		email: user.email,
 		email_verified: user.email_verified,
 		picture: user.picture,
+		role: "",
 	};
 }
 

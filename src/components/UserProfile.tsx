@@ -44,7 +44,7 @@ export default function UserProfile() {
 					</Avatar>
 					<div className="hidden flex-col items-start leading-tight sm:flex">
 						<span className="text-sm font-semibold text-foreground">{displayName}</span>
-						<span className="text-xs text-muted-foreground">Platform</span>
+						<span className="text-xs text-muted-foreground">{userInfo.role}</span>
 					</div>
 					<ChevronDown className="size-4 text-muted-foreground" />
 				</button>
