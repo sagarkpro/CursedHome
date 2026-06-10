@@ -37,14 +37,14 @@ export default function UserProfile() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<button className="flex items-center gap-2 rounded-full p-1 pr-2 transition-colors hover:bg-white/5 border-2 focus:outline-none">
-					<Avatar className="size-9">
+				<button className="min-w-24 flex items-center gap-2 rounded-full p-1.5 pr-2 transition-colors bg-background/20 backdrop-blur-3xl hover:bg-foreground/15 focus:outline-none">
+					<Avatar className="size-10">
 						<AvatarImage src={userInfo.picture} alt={displayName} />
 						<AvatarFallback className="bg-indigo-500/20 font-semibold text-indigo-300">{getInitials(userInfo)}</AvatarFallback>
 					</Avatar>
 					<div className="hidden flex-col items-start leading-tight sm:flex">
 						<span className="text-sm font-semibold text-foreground">{displayName}</span>
-						<span className="text-xs text-muted-foreground">{userInfo.role}</span>
+						<span className="text-xs text-foreground/70">{userInfo.role}</span>
 					</div>
 					<ChevronDown className="size-4 text-muted-foreground" />
 				</button>

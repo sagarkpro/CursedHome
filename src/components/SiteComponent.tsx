@@ -14,7 +14,7 @@ interface SiteComponentProps {
 function SiteComponent({ siteData, href, onClick }: SiteComponentProps) {
 	const inner = (
 		<>
-			<div className="rounded-xl border w-28 md:w-40 h-28 md:h-40 p-5 hover:p-1 bg-black/50 transition-all duration-300 overflow-hidden flex">
+			<div className="rounded-4xl w-28 md:w-40 h-28 md:h-40 p-5 hover:p-1 bg-background/20 backdrop-blur-xl transition-all duration-300 overflow-hidden flex">
 				<img className="my-auto rounded-xl object-cover" src={siteData.ImageUrl} alt={siteData.Title} width={siteData.Width ?? 224} height={siteData.Height ?? 224} />
 			</div>
 			<div className="font-bold md:text-lg my-4">{siteData.Title}</div>
