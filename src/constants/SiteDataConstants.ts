@@ -29,7 +29,7 @@ export const sites: SiteData[] = [
 	{
 		ImageUrl: "/images/json.png",
 		Title: "Json Formatter",
-		RedirectUrl: "https://jsonformatter.cursedshrine.co.in",
+		RedirectUrl: "https://jsonformatter.sudox1.com",
 	},
 	{
 		ImageUrl: "/images/youtube.png",
