@@ -21,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
 			}}
 			useRefreshTokens={true}
 			cacheLocation="localstorage"
+			useCookiesForTransactions={true} // VIP, if set to false, breaks the password reset flow
 		>
 			<QueryClientProvider client={queryClient}>
 				<AuthBootstrap />
