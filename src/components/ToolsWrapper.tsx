@@ -17,8 +17,8 @@ export default function ToolsWrapper({ tools = allTools }: { tools?: ToolData[] 
 	return (
 		<>
 			{tools.map((toolData) => (
-				<div key={`tool-${toolData.Title}`} className="m-4">
-					<SiteComponent siteData={toolData} onClick={() => selectTool(toolData.Title)} />
+				<div key={`tool-${toolData.name}`} className="m-4">
+					<SiteComponent siteData={toolData} onClick={() => selectTool(toolData.name)} />
 				</div>
 			))}
 			<Dialog open={visible} onOpenChange={setVisible}>

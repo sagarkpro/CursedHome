@@ -1,7 +1,11 @@
+export type ShortcutType = "WEB" | "REPOSITORY";
+
 export interface SiteData {
-    Title: string;
-    ImageUrl: string;
-    RedirectUrl: string;
-    Height?: number;
-    Width?: number;
+    id: string;            // UUID
+    type: ShortcutType;    // "WEB" | "REPOSITORY"
+    name: string;
+    url: string;
+    image?: string;        // nullable
 }
+
+export type ShortcutFormValues = Pick<SiteData, "name" | "url" | "image">;
