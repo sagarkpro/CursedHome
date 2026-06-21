@@ -9,3 +9,7 @@ export function splitInHalf<T>(arr: T[]): [T[], T[]] {
 	const mid = arr.length / 2;
 	return [arr.slice(0, mid), arr.slice(mid)];
 }
+
+export function getFallbackImageUrl(name: string): string {
+	return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128&rounded=true`;
+}
