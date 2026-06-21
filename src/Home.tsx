@@ -2,41 +2,69 @@ import { useState } from "react";
 import Firefox from "./components/Firefox";
 import type { ViewType } from "./models/ViewType";
 import ToolsWrapper from "./components/ToolsWrapper";
-import { sites } from "./constants/SiteDataConstants";
 import { tools } from "./constants/ToolDataConstants";
 import LocalhostPortLauncher from "./components/LocalhostPortLauncher";
 import { cn, splitInHalf } from "./Utils/common";
 import { useAuth0 } from "@auth0/auth0-react";
 import UserProfile from "./components/UserProfile";
-import { wallpaperImages } from "./constants/Constants";
 import { ImagePlus, Images } from "lucide-react";
 import type { ShortcutFormValues, ShortcutType, SiteData } from "./models/SiteData";
 import ShortcutDialog from "./components/ShortcutDialog";
 import ShortcutGrid from "./components/ShortcutGrid";
 import WallpaperDialog from "./components/WallpaperDialog";
+import LoginPromptDialog from "./components/LoginPromptDialog";
+import ConfirmDialog from "./components/ConfirmDialog";
+import DefaultProfileDialog from "./components/DefaultProfileDialog";
+import { useShortcuts } from "./hooks/useShortcuts";
+import { useWallpapers } from "./hooks/useWallpapers";
+import { useInitializeDefaults } from "./hooks/useInitializeDefaults";
 
 export default function Home() {
 	const tabs: ViewType[] = ["shortcuts", "repositories", "tools"];
-	const webSites = sites.filter((s) => s.type === "WEB");
-	const repoSites = sites.filter((s) => s.type === "REPOSITORY");
+	const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+
+	const shortcuts = useShortcuts(isAuthenticated);
+	const wallpapers = useWallpapers(isAuthenticated);
+	const initDefaults = useInitializeDefaults();
+	const allSites = shortcuts.query.data ?? [];
+	const webSites = allSites.filter((s) => s.type === "WEB");
+	const repoSites = allSites.filter((s) => s.type === "REPOSITORY");
+	const wallpaperList = wallpapers.query.data ?? [];
+
+	// Offer the default profile only once both queries have *succeeded* with empty
+	// lists — `isSuccess` avoids triggering during the initial fetch or on error.
+	const needsDefaults = isAuthenticated && shortcuts.query.isSuccess && wallpapers.query.isSuccess && allSites.length === 0 && wallpaperList.length === 0;
+
 	const [leftTools, rightTools] = splitInHalf(tools);
 	const [currentView, setCurrentView] = useState<ViewType>("shortcuts");
-	const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
 	const [isAnime, setIsAnime] = useState<boolean>(() => {
 		const stored = localStorage.getItem("isAnime");
 		return stored ? JSON.parse(stored) : false;
 	});
-	const [wallpaper, setWallpaper] = useState<string>(() => {
-		const stored = localStorage.getItem("wallpaper");
-		return stored && wallpaperImages.includes(stored) ? stored : wallpaperImages[0];
-	});
+	const [wallpaper, setWallpaper] = useState<string>(() => localStorage.getItem("wallpaper") ?? "");
 	const [shortcutDialogOpen, setShortcutDialogOpen] = useState<boolean>(false);
 	const [editingShortcut, setEditingShortcut] = useState<SiteData | null>(null);
 	const [addType, setAddType] = useState<ShortcutType>("WEB");
 	const [wallpaperDialogOpen, setWallpaperDialogOpen] = useState<boolean>(false);
+	const [loginPromptOpen, setLoginPromptOpen] = useState<boolean>(false);
+	const [pendingDelete, setPendingDelete] = useState<SiteData | null>(null);
+	const [pendingWallpaperRemove, setPendingWallpaperRemove] = useState<string | null>(null);
+	const [defaultsDismissed, setDefaultsDismissed] = useState<boolean>(false);
+
 	const translateX = isAnime ? "2.5rem" : "0px";
 	const buttonImage = getSliderImage();
-	const backgroundImage = wallpaper;
+	// Fall back to the first available wallpaper when the stored one isn't in the live list.
+	const activeWallpaper = wallpaper && wallpaperList.includes(wallpaper) ? wallpaper : wallpaperList[0] ?? "";
+	const backgroundImage = activeWallpaper;
+
+	/** Run `action` if logged in, otherwise prompt for login (customization is auth-only). */
+	function requireAuth(action: () => void) {
+		if (!isAuthenticated) {
+			setLoginPromptOpen(true);
+			return;
+		}
+		action();
+	}
 
 	function changeTheme() {
 		localStorage.setItem("isAnime", JSON.stringify(!isAnime));
@@ -44,44 +72,60 @@ export default function Home() {
 	}
 
 	function openAddShortcut(type: ShortcutType) {
-		setEditingShortcut(null);
-		setAddType(type);
-		setShortcutDialogOpen(true);
+		requireAuth(() => {
+			setEditingShortcut(null);
+			setAddType(type);
+			setShortcutDialogOpen(true);
+		});
 	}
 
 	function handleEditSite(site: SiteData) {
-		setEditingShortcut(site);
-		setShortcutDialogOpen(true);
+		requireAuth(() => {
+			setEditingShortcut(site);
+			setShortcutDialogOpen(true);
+		});
 	}
 
 	function handleDeleteSite(site: SiteData) {
-		console.log(site);
+		requireAuth(() => setPendingDelete(site));
 	}
 
-	// TODO: wire to API once shortcut persistence exists.
 	function handleSubmitShortcut(values: ShortcutFormValues) {
 		const type: ShortcutType = editingShortcut ? editingShortcut.type : addType;
-		console.log(editingShortcut ? "update shortcut" : "create shortcut", { id: editingShortcut?.id, type, ...values });
+		if (editingShortcut) {
+			shortcuts.update.mutate({ id: editingShortcut.id, dto: { type, ...values } });
+		} else {
+			shortcuts.create.mutate({ type, ...values });
+		}
 	}
 
+	// Wallpaper selection is local-only (cosmetic) — allowed for everyone.
 	function selectWallpaper(url: string) {
 		localStorage.setItem("wallpaper", url);
 		setWallpaper(url);
 	}
 
 	function cycleWallpaper() {
-		const currentIndex = wallpaperImages.indexOf(wallpaper);
-		const next = wallpaperImages[(currentIndex + 1) % wallpaperImages.length];
+		if (wallpaperList.length === 0) return;
+		const currentIndex = wallpaperList.indexOf(activeWallpaper);
+		const next = wallpaperList[(currentIndex + 1) % wallpaperList.length];
 		selectWallpaper(next);
 	}
 
-	// TODO: wire to API once wallpaper list persistence exists.
 	function handleAddWallpaper(url: string) {
-		console.log("add wallpaper", url);
+		requireAuth(() => wallpapers.update.mutate([...wallpaperList, url]));
 	}
 
 	function handleRemoveWallpaper(url: string) {
-		console.log("remove wallpaper", url);
+		requireAuth(() => setPendingWallpaperRemove(url));
+	}
+
+	function uploadWallpaperImage(file: File): Promise<string> {
+		if (!isAuthenticated) {
+			setLoginPromptOpen(true);
+			return Promise.reject(new Error("Login required"));
+		}
+		return wallpapers.uploadImage.mutateAsync(file);
 	}
 
 	function getSliderImage(): string {
@@ -159,8 +203,46 @@ export default function Home() {
 				shortcut={editingShortcut}
 				entityLabel={(editingShortcut ? editingShortcut.type : addType) === "REPOSITORY" ? "Repository" : "Shortcut"}
 				onSubmit={handleSubmitShortcut}
+				onUploadImage={(file) => shortcuts.uploadImage.mutateAsync(file)}
 			/>
-			<WallpaperDialog open={wallpaperDialogOpen} onOpenChange={setWallpaperDialogOpen} wallpapers={wallpaperImages} activeWallpaper={wallpaper} onSelect={selectWallpaper} onAdd={handleAddWallpaper} onRemove={handleRemoveWallpaper} />
+			<WallpaperDialog
+				open={wallpaperDialogOpen}
+				onOpenChange={setWallpaperDialogOpen}
+				wallpapers={wallpaperList}
+				activeWallpaper={activeWallpaper}
+				onSelect={selectWallpaper}
+				onAdd={handleAddWallpaper}
+				onRemove={handleRemoveWallpaper}
+				onUploadImage={uploadWallpaperImage}
+			/>
+			<LoginPromptDialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen} />
+			<DefaultProfileDialog
+				open={needsDefaults && !defaultsDismissed}
+				onOpenChange={(o) => !o && setDefaultsDismissed(true)}
+				pending={initDefaults.isPending}
+				onConfirm={() => initDefaults.mutate()}
+			/>
+			<ConfirmDialog
+				open={Boolean(pendingDelete)}
+				onOpenChange={(o) => !o && setPendingDelete(null)}
+				title={`Delete ${pendingDelete?.type === "REPOSITORY" ? "repository" : "shortcut"}?`}
+				description={
+					<>
+						This will permanently remove <strong className="text-foreground">{pendingDelete?.name}</strong>. This can't be undone.
+					</>
+				}
+				pending={shortcuts.remove.isPending}
+				onConfirm={() => pendingDelete && shortcuts.remove.mutate(pendingDelete.id, { onSuccess: () => setPendingDelete(null) })}
+			/>
+			<ConfirmDialog
+				open={Boolean(pendingWallpaperRemove)}
+				onOpenChange={(o) => !o && setPendingWallpaperRemove(null)}
+				title="Remove wallpaper?"
+				description="This removes the wallpaper from your collection. This can't be undone."
+				confirmLabel="Remove"
+				pending={wallpapers.update.isPending}
+				onConfirm={() => pendingWallpaperRemove && wallpapers.update.mutate(wallpaperList.filter((w) => w !== pendingWallpaperRemove), { onSuccess: () => setPendingWallpaperRemove(null) })}
+			/>
 		</div>
 	);
 }

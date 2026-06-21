@@ -14,9 +14,11 @@ interface ShortcutDialogProps {
 	/** Noun shown in the title/submit button, e.g. "Shortcut" or "Repository". */
 	entityLabel?: string;
 	onSubmit: (values: ShortcutFormValues) => void;
+	/** Uploads the picked icon and resolves with its hosted URL. */
+	onUploadImage: (file: File) => Promise<string>;
 }
 
-export default function ShortcutDialog({ open, onOpenChange, shortcut, entityLabel = "Shortcut", onSubmit }: ShortcutDialogProps) {
+export default function ShortcutDialog({ open, onOpenChange, shortcut, entityLabel = "Shortcut", onSubmit, onUploadImage }: ShortcutDialogProps) {
 	const isEdit = Boolean(shortcut);
 
 	return (
@@ -31,6 +33,7 @@ export default function ShortcutDialog({ open, onOpenChange, shortcut, entityLab
 					initial={shortcut}
 					isEdit={isEdit}
 					entityLabel={entityLabel}
+					onUploadImage={onUploadImage}
 					onSubmit={(values) => {
 						onSubmit(values);
 						onOpenChange(false);
@@ -41,7 +44,7 @@ export default function ShortcutDialog({ open, onOpenChange, shortcut, entityLab
 	);
 }
 
-function ShortcutForm({ initial, isEdit, entityLabel, onSubmit }: { initial?: SiteData | null; isEdit: boolean; entityLabel: string; onSubmit: (values: ShortcutFormValues) => void }) {
+function ShortcutForm({ initial, isEdit, entityLabel, onSubmit, onUploadImage }: { initial?: SiteData | null; isEdit: boolean; entityLabel: string; onSubmit: (values: ShortcutFormValues) => void; onUploadImage: (file: File) => Promise<string> }) {
 	const [values, setValues] = useState<ShortcutFormValues>({
 		name: initial?.name ?? "",
 		url: initial?.url ?? "",
@@ -57,7 +60,7 @@ function ShortcutForm({ initial, isEdit, entityLabel, onSubmit }: { initial?: Si
 			<div className="flex flex-col gap-4 py-2">
 				<div className="flex flex-col gap-2">
 					<Label>Icon / Image</Label>
-					<ImageUploadField value={values.image} onFileSelected={(file) => console.log("[ShortcutDialog] file selected", file)} />
+					<ImageUploadField value={values.image} onUpload={onUploadImage} onUploaded={(url) => update("image", url)} helperText="PNG, JPG, GIF, WEBP or BMP up to 5MB" />
 					<Input type="url" placeholder="...or paste an image URL" value={values.image ?? ""} onChange={(e) => update("image", e.target.value)} />
 				</div>
 

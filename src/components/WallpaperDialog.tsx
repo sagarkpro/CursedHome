@@ -15,9 +15,11 @@ interface WallpaperDialogProps {
 	onSelect: (url: string) => void;
 	onAdd: (url: string) => void;
 	onRemove: (url: string) => void;
+	/** Uploads the picked wallpaper and resolves with its hosted URL. */
+	onUploadImage: (file: File) => Promise<string>;
 }
 
-export default function WallpaperDialog({ open, onOpenChange, wallpapers, activeWallpaper, onSelect, onAdd, onRemove }: WallpaperDialogProps) {
+export default function WallpaperDialog({ open, onOpenChange, wallpapers, activeWallpaper, onSelect, onAdd, onRemove, onUploadImage }: WallpaperDialogProps) {
 	const [newUrl, setNewUrl] = useState("");
 
 	function handleAdd() {
@@ -92,7 +94,7 @@ export default function WallpaperDialog({ open, onOpenChange, wallpapers, active
 								Add
 							</Button>
 						</div>
-						<ImageUploadField value={newUrl || undefined} onFileSelected={(file) => console.log("[WallpaperDialog] file selected", file)} />
+						<ImageUploadField onUpload={onUploadImage} onUploaded={(url) => onAdd(url)} helperText="PNG, JPG, GIF, WEBP or BMP up to 10MB" />
 					</div>
 				</div>
 
