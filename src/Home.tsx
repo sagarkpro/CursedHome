@@ -102,16 +102,16 @@ export default function Home() {
 					<div className="w-full flex flex-col md:flex-row">
 						<div id="left-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
 							{leftSites.map((site) => (
-								<div key={site.Title} className="m-4">
-									<SiteComponent siteData={site} href={site.RedirectUrl} />
+								<div key={site.id} className="m-4">
+									<SiteComponent siteData={site} href={site.url} />
 								</div>
 							))}
 						</div>
 						<div className="hidden md:block w-1/3"></div>
 						<div id="right-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
 							{rightSites.map((site) => (
-								<div key={site.Title} className="m-4">
-									<SiteComponent siteData={site} href={site.RedirectUrl} />
+								<div key={site.id} className="m-4">
+									<SiteComponent siteData={site} href={site.url} />
 								</div>
 							))}
 						</div>

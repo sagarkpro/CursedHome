@@ -2,7 +2,7 @@ import type { ToolData } from "@/models/ToolData";
 
 export const tools: ToolData[] = [
 	{
-		ImageUrl: "/images/guid.png",
-		Title: "Guid Generator",
+		name: "Guid Generator",
+		image: "/images/guid.png",
 	},
 ];
