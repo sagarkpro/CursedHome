@@ -8,4 +8,4 @@ export interface SiteData {
     image?: string;        // nullable
 }
 
-export type ShortcutFormValues = Pick<SiteData, "name" | "url" | "image">;
+export type ShortcutFormValues = Pick<SiteData, "name" | "url" | "image" | "type">;
