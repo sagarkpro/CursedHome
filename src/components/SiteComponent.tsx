@@ -12,6 +12,8 @@ interface SiteComponentProps {
 	onClick?: () => void;
 	onEdit?: () => void;
 	onDelete?: () => void;
+	/** Force the name-based fallback image. Defaults to whether action buttons are shown. */
+	withFallback?: boolean;
 }
 
 function CardBody({ siteData, withFallback }: { siteData: CardData; withFallback: boolean }) {
@@ -63,20 +65,25 @@ function CardActions({ onEdit, onDelete }: { onEdit?: () => void; onDelete?: () 
 	);
 }
 
-function SiteComponent({ siteData, href, onClick, onEdit, onDelete }: SiteComponentProps) {
+function SiteComponent({ siteData, href, onClick, onEdit, onDelete, withFallback }: SiteComponentProps) {
 	const showActions = Boolean(onEdit || onDelete);
+	const useFallback = withFallback ?? showActions;
 
 	return (
 		<div className="relative group flex flex-col items-center">
 			{showActions && <CardActions onEdit={onEdit} onDelete={onDelete} />}
 			{onClick ? (
 				<button className="flex flex-col items-center hover:cursor-pointer" onClick={onClick}>
-					<CardBody siteData={siteData} withFallback={showActions} />
+					<CardBody siteData={siteData} withFallback={useFallback} />
 				</button>
-			) : (
+			) : href ? (
 				<a className="flex flex-col items-center hover:cursor-pointer" href={href} target="_blank">
-					<CardBody siteData={siteData} withFallback={showActions} />
+					<CardBody siteData={siteData} withFallback={useFallback} />
 				</a>
+			) : (
+				<div className="flex flex-col items-center">
+					<CardBody siteData={siteData} withFallback={useFallback} />
+				</div>
 			)}
 		</div>
 	);

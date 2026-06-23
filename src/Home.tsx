@@ -7,7 +7,7 @@ import LocalhostPortLauncher from "./components/LocalhostPortLauncher";
 import { cn, splitInHalf } from "./Utils/common";
 import { useAuth0 } from "@auth0/auth0-react";
 import UserProfile from "./components/UserProfile";
-import { ImagePlus, Images } from "lucide-react";
+import { ImagePlus, Images, Loader2 } from "lucide-react";
 import type { ShortcutFormValues, ShortcutType, SiteData } from "./models/SiteData";
 import ShortcutDialog from "./components/ShortcutDialog";
 import ShortcutGrid from "./components/ShortcutGrid";
@@ -18,6 +18,7 @@ import DefaultProfileDialog from "./components/DefaultProfileDialog";
 import { useShortcuts } from "./hooks/useShortcuts";
 import { useWallpapers } from "./hooks/useWallpapers";
 import { useInitializeDefaults } from "./hooks/useInitializeDefaults";
+import { GlobalLoader } from "./components/GlobalLoader";
 
 export default function Home() {
 	const tabs: ViewType[] = ["shortcuts", "repositories", "tools"];
@@ -48,8 +49,8 @@ export default function Home() {
 	const [wallpaperDialogOpen, setWallpaperDialogOpen] = useState<boolean>(false);
 	const [loginPromptOpen, setLoginPromptOpen] = useState<boolean>(false);
 	const [pendingDelete, setPendingDelete] = useState<SiteData | null>(null);
-	const [pendingWallpaperRemove, setPendingWallpaperRemove] = useState<string | null>(null);
 	const [defaultsDismissed, setDefaultsDismissed] = useState<boolean>(false);
+	const [loggingIn, setLoggingIn] = useState<boolean>(false);
 
 	const translateX = isAnime ? "2.5rem" : "0px";
 	const buttonImage = getSliderImage();
@@ -91,11 +92,10 @@ export default function Home() {
 	}
 
 	function handleSubmitShortcut(values: ShortcutFormValues) {
-		const type: ShortcutType = editingShortcut ? editingShortcut.type : addType;
 		if (editingShortcut) {
-			shortcuts.update.mutate({ id: editingShortcut.id, dto: { type, ...values } });
+			shortcuts.update.mutate({ id: editingShortcut.id, dto: { ...values } });
 		} else {
-			shortcuts.create.mutate({ type, ...values });
+			shortcuts.create.mutate({ ...values });
 		}
 	}
 
@@ -112,12 +112,8 @@ export default function Home() {
 		selectWallpaper(next);
 	}
 
-	function handleAddWallpaper(url: string) {
-		requireAuth(() => wallpapers.update.mutate([...wallpaperList, url]));
-	}
-
-	function handleRemoveWallpaper(url: string) {
-		requireAuth(() => setPendingWallpaperRemove(url));
+	function handleSaveWallpapers(urls: string[]) {
+		requireAuth(() => wallpapers.update.mutate(urls, { onSuccess: () => setWallpaperDialogOpen(false) }));
 	}
 
 	function uploadWallpaperImage(file: File): Promise<string> {
@@ -131,6 +127,12 @@ export default function Home() {
 	function getSliderImage(): string {
 		return "bg-[url(/images/ichigo.jpg)]";
 	}
+
+	// First paint: hold the screen until Auth0 resolves and the initial
+	// shortcuts/wallpaper fetch lands. `query.isLoading` is only true on the very
+	// first fetch (no cached data), so this won't reappear on background refetches.
+	const isBooting = isLoading || shortcuts.query.isLoading || wallpapers.query.isLoading;
+	if (isBooting) return <GlobalLoader />;
 
 	return (
 		<div className={`w-full h-svh overflow-clip bg-cover bg-center ${isAnime ? "" : "bg-black"}`} style={isAnime ? { backgroundImage: `url(${backgroundImage})` } : undefined}>
@@ -160,7 +162,15 @@ export default function Home() {
 							{isLoading ? null : isAuthenticated ? (
 								<UserProfile />
 							) : (
-								<button onClick={() => loginWithRedirect()} className="px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">
+								<button
+									onClick={() => {
+										setLoggingIn(true);
+										loginWithRedirect().catch(() => setLoggingIn(false));
+									}}
+									disabled={loggingIn}
+									className="inline-flex items-center gap-2 px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+								>
+									{loggingIn && <Loader2 className="size-5 animate-spin" />}
 									Login
 								</button>
 							)}
@@ -202,6 +212,7 @@ export default function Home() {
 				onOpenChange={setShortcutDialogOpen}
 				shortcut={editingShortcut}
 				entityLabel={(editingShortcut ? editingShortcut.type : addType) === "REPOSITORY" ? "Repository" : "Shortcut"}
+				defaultType={editingShortcut ? editingShortcut.type : addType}
 				onSubmit={handleSubmitShortcut}
 				onUploadImage={(file) => shortcuts.uploadImage.mutateAsync(file)}
 			/>
@@ -211,8 +222,8 @@ export default function Home() {
 				wallpapers={wallpaperList}
 				activeWallpaper={activeWallpaper}
 				onSelect={selectWallpaper}
-				onAdd={handleAddWallpaper}
-				onRemove={handleRemoveWallpaper}
+				onSave={handleSaveWallpapers}
+				saving={wallpapers.update.isPending}
 				onUploadImage={uploadWallpaperImage}
 			/>
 			<LoginPromptDialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen} />
@@ -233,15 +244,6 @@ export default function Home() {
 				}
 				pending={shortcuts.remove.isPending}
 				onConfirm={() => pendingDelete && shortcuts.remove.mutate(pendingDelete.id, { onSuccess: () => setPendingDelete(null) })}
-			/>
-			<ConfirmDialog
-				open={Boolean(pendingWallpaperRemove)}
-				onOpenChange={(o) => !o && setPendingWallpaperRemove(null)}
-				title="Remove wallpaper?"
-				description="This removes the wallpaper from your collection. This can't be undone."
-				confirmLabel="Remove"
-				pending={wallpapers.update.isPending}
-				onConfirm={() => pendingWallpaperRemove && wallpapers.update.mutate(wallpaperList.filter((w) => w !== pendingWallpaperRemove), { onSuccess: () => setPendingWallpaperRemove(null) })}
 			/>
 		</div>
 	);
