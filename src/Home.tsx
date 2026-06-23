@@ -7,7 +7,7 @@ import LocalhostPortLauncher from "./components/LocalhostPortLauncher";
 import { cn, splitInHalf } from "./Utils/common";
 import { useAuth0 } from "@auth0/auth0-react";
 import UserProfile from "./components/UserProfile";
-import { ImagePlus, Images, Loader2 } from "lucide-react";
+import { ImagePlus, Images } from "lucide-react";
 import type { ShortcutFormValues, ShortcutType, SiteData } from "./models/SiteData";
 import ShortcutDialog from "./components/ShortcutDialog";
 import ShortcutGrid from "./components/ShortcutGrid";
@@ -50,7 +50,6 @@ export default function Home() {
 	const [loginPromptOpen, setLoginPromptOpen] = useState<boolean>(false);
 	const [pendingDelete, setPendingDelete] = useState<SiteData | null>(null);
 	const [defaultsDismissed, setDefaultsDismissed] = useState<boolean>(false);
-	const [loggingIn, setLoggingIn] = useState<boolean>(false);
 
 	const translateX = isAnime ? "2.5rem" : "0px";
 	const buttonImage = getSliderImage();
@@ -163,14 +162,9 @@ export default function Home() {
 								<UserProfile />
 							) : (
 								<button
-									onClick={() => {
-										setLoggingIn(true);
-										loginWithRedirect().catch(() => setLoggingIn(false));
-									}}
-									disabled={loggingIn}
-									className="inline-flex items-center gap-2 px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+									onClick={() => loginWithRedirect()}
+									className="inline-flex items-center gap-2 px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer"
 								>
-									{loggingIn && <Loader2 className="size-5 animate-spin" />}
 									Login
 								</button>
 							)}
