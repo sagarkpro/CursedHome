@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { LogIn } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,7 +15,6 @@ interface LoginPromptDialogProps {
  */
 export default function LoginPromptDialog({ open, onOpenChange }: LoginPromptDialogProps) {
 	const { loginWithRedirect } = useAuth0();
-	const [loggingIn, setLoggingIn] = useState(false);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,15 +31,7 @@ export default function LoginPromptDialog({ open, onOpenChange }: LoginPromptDia
 					<DialogClose asChild>
 						<Button variant="ghost">Cancel</Button>
 					</DialogClose>
-					<Button
-						loading={loggingIn}
-						onClick={() => {
-							setLoggingIn(true);
-							loginWithRedirect().catch(() => setLoggingIn(false));
-						}}
-					>
-						Login / Register
-					</Button>
+					<Button onClick={() => loginWithRedirect()}>Login / Register</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
