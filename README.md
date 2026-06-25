@@ -1,75 +1,161 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🚀 **LIVE @**
 
-Currently, two official plugins are available:
+# **👉 https://sudox1.com 👈**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### **Experience CursedHome in your browser right now.**
 
-## React Compiler
+<a href="https://sudox1.com">
+  <img src="https://img.shields.io/badge/🌐%20Visit%20Now-sudox1.com-8B5CF6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Visit Live Demo">
+</a>
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+<br>
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+# 🏠 CursedHome
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### **Your browser. Your rules. Zero clutter.**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+*A modern, self-hosted homepage for developers and power users.*
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+</div>
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+<p align="center">
+  <a href="https://sudox1.com">
+    <img src="./screenshots/home.png" alt="CursedHome Dashboard">
+  </a>
+</p>
+
+<p align="center">
+  <strong>⭐ Stop opening the same 20 tabs every morning.</strong><br>
+  Launch everything from one beautiful dashboard.
+</p>
+
+---
+
+# ✨ Features
+
+## 🔐 One Login. Forever.
+
+Forget logging in every few days.
+
+* 🚀 Dedicated SSO authentication
+* ♻️ Automatic refresh tokens
+* 📧 Email OTP verification
+* 🔑 Forgot password support
+* 👤 Profile picture uploads
+
+---
+
+## ⚡ Your Shortcuts, Your Way
+
+Build a homepage that works the way **you** do.
+
+* ➕ Add unlimited shortcuts
+* ✏️ Edit them anytime
+* 🖼️ Upload custom icons
+* 🎯 Keep everything beautifully organized
+
+<p align="center">
+  <img src="./screenshots/edit-shortcut.png" alt="Edit Shortcut" width="90%">
+</p>
+
+---
+
+## 🎨 Wallpapers That Match Your Mood
+
+A homepage should never be boring.
+
+* 🌄 Upload your own wallpapers
+* 🎭 Switch backgrounds whenever you like
+* ✨ Personalize every new tab
+
+<p align="center">
+  <img src="./screenshots/edit-wallpapers.png" alt="Wallpaper Manager" width="90%">
+</p>
+
+---
+
+## 🪄 Drag. Drop. Done.
+
+Reorder your shortcuts effortlessly.
+
+No settings.
+
+No complicated menus.
+
+Just drag, drop, and you're done.
+
+---
+
+## 🌐 Two Types of Shortcuts
+
+### 🔗 Web Shortcuts
+
+Your everyday websites, always one click away.
+
+* ChatGPT
+* Claude
+* YouTube
+* Amazon
+* Gmail
+* Reddit
+* ...and literally any website.
+
+---
+
+### 📦 Repository Shortcuts
+
+Built for developers.
+
+Save direct links to your repositories—not just GitHub pages.
+
+```text
+https://github.com/sagarkpro/CursedBackend
+https://gitlab.com/company/backend-api
+https://codeberg.org/user/project
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open your codebase in a single click.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+# 🔐 Built-in SSO
+
+CursedHome includes a modern authentication system designed for seamless sign-ins.
+
+* 🔄 Refresh Token Grant
+* ⚛️ Compatible with the React Auth0 SDK
+* 📧 Email Verification
+* 🔑 Forgot Password
+* 👤 Profile Picture Uploads
+
+---
+
+# 💜 Why CursedHome?
+
+Because browser homepages shouldn't look like they were designed in 2012.
+
+Whether you're a developer, student, designer, or someone with way too many bookmarks, CursedHome keeps everything you need exactly where you expect it.
+
+Fast.
+
+Beautiful.
+
+Personal.
+
+Always one click away.
+
+---
+
+<div align="center">
+
+## ⭐ If you like CursedHome, consider giving the repository a Star!
+
+It helps others discover the project and motivates future updates. 💜
+
+</div>
