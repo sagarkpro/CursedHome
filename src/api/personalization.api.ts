@@ -28,6 +28,15 @@ export const updateShortcut = (id: string, dto: ShortcutPayload) => api.put<null
 
 export const deleteShortcut = (id: string) => api.delete<null>(`${BASE}/${id}/shortcut`);
 
+/** Move shortcut `id` to sit between `prev` and `next` (either null = list head/tail). */
+export interface ShortcutReorder {
+	id: string;
+	prev: string | null;
+	next: string | null;
+}
+
+export const reorderShortcut = (dto: ShortcutReorder) => api.post<null>(`${BASE}/shortcut/reorder`, dto);
+
 // ---- Wallpapers ----
 
 export const getWallpapers = () => api.get<string[]>(`${BASE}/wallpapers`);

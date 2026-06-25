@@ -186,7 +186,9 @@ export default function Home() {
 					})}
 				</div>
 
-				{currentView === "shortcuts" && <ShortcutGrid sites={webSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("WEB")} />}
+				{currentView === "shortcuts" && (
+					<ShortcutGrid sites={webSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("WEB")} canReorder={isAuthenticated} onReorder={(dto) => shortcuts.reorder.mutate(dto)} />
+				)}
 				{currentView === "tools" && (
 					<div className="w-full flex flex-col md:flex-row">
 						<div className="flex max-w-screen-2xl flex-wrap justify-center">
@@ -198,7 +200,9 @@ export default function Home() {
 						</div>
 					</div>
 				)}
-				{currentView === "repositories" && <ShortcutGrid sites={repoSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("REPOSITORY")} />}
+				{currentView === "repositories" && (
+					<ShortcutGrid sites={repoSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("REPOSITORY")} canReorder={isAuthenticated} onReorder={(dto) => shortcuts.reorder.mutate(dto)} />
+				)}
 			</div>
 			<LocalhostPortLauncher />
 			<ShortcutDialog
