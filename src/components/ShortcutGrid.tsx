@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Plus } from "lucide-react";
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
@@ -35,6 +35,30 @@ function SortableSiteCard({ site, onEdit, onDelete }: { site: SiteData; onEdit: 
 	);
 }
 
+/** Two-column presentational grid + centered add button. Card rendering is
+ *  injected via `renderCard` so it works for both the static and sortable grids. */
+function GridLayout({ leftSites, rightSites, renderCard, addButton }: { leftSites: SiteData[]; rightSites: SiteData[]; renderCard: (site: SiteData) => ReactNode; addButton: ReactNode }) {
+	const leftUnbalanced = leftSites?.length < rightSites?.length;
+	const rightUnbalanced = leftSites?.length > rightSites?.length;
+
+	return (
+		<div className="w-full flex flex-col">
+			<div className="w-full flex flex-col md:flex-row">
+				<div id="left-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
+					{leftSites.map(renderCard)}
+					{leftUnbalanced && <div className="invisible pointer-events-none">{renderCard(rightSites[0])}</div>}
+				</div>
+				<div className="hidden md:block w-1/3"></div>
+				<div id="right-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
+					{rightSites.map(renderCard)}
+					{rightUnbalanced && <div className="invisible pointer-events-none">{renderCard(leftSites[0])}</div>}
+				</div>
+			</div>
+			<div className="w-full flex justify-center">{addButton}</div>
+		</div>
+	);
+}
+
 export default function ShortcutGrid({ sites, onEdit, onDelete, onAdd, canReorder = false, onReorder }: ShortcutGridProps) {
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const sensors = useSensors(
@@ -59,24 +83,16 @@ export default function ShortcutGrid({ sites, onEdit, onDelete, onAdd, canReorde
 	// Logged-out: original static grid, no drag overhead.
 	if (!canReorder) {
 		return (
-			<div className="w-full flex flex-col md:flex-row">
-				<div id="left-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
-					{leftSites.map((site) => (
-						<div key={site.id} className="m-4">
-							<SiteComponent siteData={site} href={site.url} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />
-						</div>
-					))}
-					{addButton}
-				</div>
-				<div className="hidden md:block w-1/3"></div>
-				<div id="right-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
-					{rightSites.map((site) => (
-						<div key={site.id} className="m-4">
-							<SiteComponent siteData={site} href={site.url} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />
-						</div>
-					))}
-				</div>
-			</div>
+			<GridLayout
+				leftSites={leftSites}
+				rightSites={rightSites}
+				addButton={addButton}
+				renderCard={(site) => (
+					<div key={site.id} className="m-4">
+						<SiteComponent siteData={site} href={site.url} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />
+					</div>
+				)}
+			/>
 		);
 	}
 
@@ -99,36 +115,17 @@ export default function ShortcutGrid({ sites, onEdit, onDelete, onAdd, canReorde
 	const activeSite = activeId ? sites.find((s) => s.id === activeId) : null;
 
 	return (
-		<DndContext
-			sensors={sensors}
-			collisionDetection={closestCenter}
-			onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
-			onDragEnd={handleDragEnd}
-			onDragCancel={() => setActiveId(null)}
-		>
+		<DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))} onDragEnd={handleDragEnd} onDragCancel={() => setActiveId(null)}>
 			{/* One SortableContext spans both columns so drags cross the boundary. */}
 			<SortableContext items={sites.map((s) => s.id)} strategy={rectSortingStrategy}>
-				<div className="w-full flex flex-col md:flex-row">
-					<div id="left-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
-						{leftSites.map((site) => (
-							<SortableSiteCard key={site.id} site={site} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />
-						))}
-						{addButton}
-					</div>
-					<div className="hidden md:block w-1/3"></div>
-					<div id="right-content-div" className="flex max-w-screen-2xl flex-wrap justify-center">
-						{rightSites.map((site) => (
-							<SortableSiteCard key={site.id} site={site} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />
-						))}
-					</div>
-				</div>
+				<GridLayout leftSites={leftSites} rightSites={rightSites} addButton={addButton} renderCard={(site) => <SortableSiteCard key={site.id} site={site} onEdit={() => onEdit(site)} onDelete={() => onDelete(site)} />} />
 			</SortableContext>
 			<DragOverlay>
-				{activeSite ? (
+				{activeSite && (
 					<div className="m-4">
 						<SiteComponent siteData={activeSite} href={activeSite.url} />
 					</div>
-				) : null}
+				)}
 			</DragOverlay>
 		</DndContext>
 	);
