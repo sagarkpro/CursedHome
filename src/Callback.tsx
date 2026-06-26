@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { GlobalLoader } from "./components/GlobalLoader";
+import { AuthError } from "./components/AuthError";
 
 export default function Callback() {
 	const { isLoading, error } = useAuth0();
@@ -11,8 +13,8 @@ export default function Callback() {
 	}, [isLoading, error, navigate]);
 
 	if (error) {
-		return <div className="w-full h-svh flex items-center justify-center text-white">Authentication error: {error.message}</div>;
+		return <AuthError error={error} />;
 	}
 
-	return <div className="w-full h-svh flex items-center justify-center text-white">Signing you in…</div>;
+	return <GlobalLoader message="Signing you in…" />;
 }
