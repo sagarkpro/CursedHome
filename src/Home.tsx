@@ -54,7 +54,7 @@ export default function Home() {
 	const translateX = isAnime ? "2.5rem" : "0px";
 	const buttonImage = getSliderImage();
 	// Fall back to the first available wallpaper when the stored one isn't in the live list.
-	const activeWallpaper = wallpaper && wallpaperList.includes(wallpaper) ? wallpaper : wallpaperList[0] ?? "";
+	const activeWallpaper = wallpaper && wallpaperList.includes(wallpaper) ? wallpaper : (wallpaperList[0] ?? "");
 	const backgroundImage = activeWallpaper;
 
 	/** Run `action` if logged in, otherwise prompt for login (customization is auth-only). */
@@ -161,10 +161,7 @@ export default function Home() {
 							{isLoading ? null : isAuthenticated ? (
 								<UserProfile />
 							) : (
-								<button
-									onClick={() => loginWithRedirect()}
-									className="inline-flex items-center gap-2 px-6 py-2 bg-rose-300 hover:bg-rose-200 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer"
-								>
+								<button onClick={() => loginWithRedirect()} className="inline-flex items-center gap-2 px-6 py-2 bg-rose-400 hover:bg-rose-300 transition-colors duration-300 rounded-3xl text-xl text-background font-semibold hover:cursor-pointer">
 									Login
 								</button>
 							)}
@@ -186,9 +183,7 @@ export default function Home() {
 					})}
 				</div>
 
-				{currentView === "shortcuts" && (
-					<ShortcutGrid sites={webSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("WEB")} canReorder={isAuthenticated} onReorder={(dto) => shortcuts.reorder.mutate(dto)} />
-				)}
+				{currentView === "shortcuts" && <ShortcutGrid sites={webSites} onEdit={handleEditSite} onDelete={handleDeleteSite} onAdd={() => openAddShortcut("WEB")} canReorder={isAuthenticated} onReorder={(dto) => shortcuts.reorder.mutate(dto)} />}
 				{currentView === "tools" && (
 					<div className="w-full flex flex-col md:flex-row">
 						<div className="flex max-w-screen-2xl flex-wrap justify-center">
@@ -225,12 +220,7 @@ export default function Home() {
 				onUploadImage={uploadWallpaperImage}
 			/>
 			<LoginPromptDialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen} />
-			<DefaultProfileDialog
-				open={needsDefaults && !defaultsDismissed}
-				onOpenChange={(o) => !o && setDefaultsDismissed(true)}
-				pending={initDefaults.isPending}
-				onConfirm={() => initDefaults.mutate()}
-			/>
+			<DefaultProfileDialog open={needsDefaults && !defaultsDismissed} onOpenChange={(o) => !o && setDefaultsDismissed(true)} pending={initDefaults.isPending} onConfirm={() => initDefaults.mutate()} />
 			<ConfirmDialog
 				open={Boolean(pendingDelete)}
 				onOpenChange={(o) => !o && setPendingDelete(null)}
